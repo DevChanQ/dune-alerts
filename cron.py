@@ -28,7 +28,7 @@ def run_query(path: str):
     )
     query_runner.run_loop()
 
-@sched.scheduled_job('interval', minutes=3)
+@sched.scheduled_job('interval', hours=6)
 def timed_job():
     run_query("./ao-steth.yaml")
 
