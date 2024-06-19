@@ -1,0 +1,4 @@
+name: Total value of stETH deposited
+id: 3834081
+column: Accum_NetETHVal
+formatter: ${}mil

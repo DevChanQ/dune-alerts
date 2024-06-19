@@ -1,4 +1,4 @@
-"""QueryMonitor for Counters. Alert set to valuation"""
+"""SimpleMonitor for relaying query results. Alert set to valuation"""
 
 from dune_client.types import DuneRecord
 from dune_client.query import Query
@@ -7,7 +7,7 @@ from src.alert import Alert
 from src.query_monitor.base import QueryBase
 
 
-class CounterQueryMonitor(QueryBase):
+class SimpleQueryMonitor(QueryBase):
     """
     All queries here, must return a single record specifying a column with numeric type.
     """
@@ -16,24 +16,17 @@ class CounterQueryMonitor(QueryBase):
         self,
         query: Query,
         column: str,
-        alert_value: float = 0.0,
+        formatter: str
     ):
         super().__init__(query)
         self.column = column
-        self.alert_value = alert_value
+        self.formatter = formatter
 
     def _result_value(self, results: list[DuneRecord]) -> float:
         # assert len(results) == 1, f"Expected single record, got {results}"
         return float(results[0][self.column])
 
     def get_alert(self, results: list[DuneRecord]) -> Alert:
-        result_value = self._result_value(results)
-        if result_value > self.alert_value:
-            return Alert.slack(
-                message=f"Query {self.name}: {self.column} exceeds {self.alert_value} "
-                f"with {self._result_value(results)} (cf. {self.result_url()})",
-            )
-        return Alert.log(
-            message=f"value of {self.column} = {result_value} "
-            f"does not exceed {self.alert_value}",
+        return Alert.slack(
+            message=f"{self.name}: {self.formatter.format(self._result_value(results))} (cf. {self.result_url()})"
         )

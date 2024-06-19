@@ -16,6 +16,7 @@ from src.query_monitor.base import QueryBase
 from src.query_monitor.counter import CounterQueryMonitor
 from src.query_monitor.left_bounded import LeftBoundedQueryMonitor
 from src.query_monitor.result_threshold import ResultThresholdQuery
+from src.query_monitor.simple import SimpleQueryMonitor
 from src.query_monitor.windowed import WindowedQueryMonitor
 
 log = logging.getLogger(__name__)
@@ -61,6 +62,7 @@ def load_config(config_yaml: str) -> Config:
     )
 
     threshold = cfg.get("threshold", 0)
+    formatter = cfg.get("formatter", "{}")
     base_query: QueryBase
     if "window" in cfg:
         # Windowed Query
@@ -74,6 +76,9 @@ def load_config(config_yaml: str) -> Config:
         # Counter Query
         column, alert_value = cfg["column"], float(cfg["alert_value"])
         base_query = CounterQueryMonitor(query, column, alert_value)
+    elif "column" in cfg:
+        column = cfg["column"]
+        base_query = SimpleQueryMonitor(query, column, formatter)
     else:
         base_query = ResultThresholdQuery(query, threshold)
 
