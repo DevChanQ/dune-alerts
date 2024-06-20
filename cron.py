@@ -4,7 +4,7 @@ import dotenv
 from apscheduler.schedulers.blocking import BlockingScheduler
 from dune_client.client import DuneClient
 
-from src.query_monitor.factory import load_config, AlertType
+from src.query_monitor.factory import load_config
 from src.slack_client import BasicSlackClient
 from src.runner import QueryRunner
 
@@ -28,8 +28,9 @@ def run_query(path: str):
     )
     query_runner.run_loop()
 
-@sched.scheduled_job('interval', hours=6)
+@sched.scheduled_job('interval', minutes=50)
 def timed_job():
-    run_query("./ao-steth.yaml")
+    run_query("./configs/ao-steth.yaml")
+    run_query("./configs/total-depositor.yaml")
 
 sched.start()

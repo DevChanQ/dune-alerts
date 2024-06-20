@@ -17,6 +17,7 @@ from src.query_monitor.counter import CounterQueryMonitor
 from src.query_monitor.left_bounded import LeftBoundedQueryMonitor
 from src.query_monitor.result_threshold import ResultThresholdQuery
 from src.query_monitor.simple import SimpleQueryMonitor
+from src.query_monitor.interval import IntervalQueryMonitor
 from src.query_monitor.windowed import WindowedQueryMonitor
 
 log = logging.getLogger(__name__)
@@ -73,10 +74,18 @@ def load_config(config_yaml: str) -> Config:
         left_bound = LeftBound.from_cfg(cfg["left_bound"])
         base_query = LeftBoundedQueryMonitor(query, left_bound, threshold)
     elif "column" in cfg and "alert_value" in cfg:
-        # Counter Query
-        column, alert_value = cfg["column"], float(cfg["alert_value"])
-        base_query = CounterQueryMonitor(query, column, alert_value)
+        # check if % is in alert value
+        column = cfg["column"]
+        is_interval = "%" in cfg["alert_value"]
+        if is_interval:
+            interval_value = float(cfg["alert_value"].split("%")[1])
+            base_query = IntervalQueryMonitor(query, column, formatter, interval_value)
+        else:
+            # Counter Query
+            alert_value = float(cfg["alert_value"])
+            base_query = CounterQueryMonitor(query, column, alert_value)
     elif "column" in cfg:
+        # Simple Query
         column = cfg["column"]
         base_query = SimpleQueryMonitor(query, column, formatter)
     else:

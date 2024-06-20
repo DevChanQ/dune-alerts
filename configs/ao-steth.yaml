@@ -1,0 +1,5 @@
+name: Total value of stETH deposited (USD)
+id: 3834081
+column: Accum_NetETHVal
+formatter: "${:.2f}mil"
+alert_value: "%50"

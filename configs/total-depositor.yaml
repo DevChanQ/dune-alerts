@@ -1,0 +1,5 @@
+name: Total stETH Depositors
+id: 3834565
+column: _col0
+formatter: "{:0.0f}"
+alert_value: "%50"
